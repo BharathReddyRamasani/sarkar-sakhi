@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sarkar-Sakhi — Accessible Government Pension Assistant (Telangana)</title>
+<!-- Tailwind CSS v3 with forms and container-queries plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Plus Jakarta Sans & Noto Sans Telugu for crisp bilingual rendering -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '"Noto Sans Telugu"', 'sans-serif'],
+          },
+          colors: {
+            cream: '#FAF6EE',
+            peach: '#FCEEE3',
+            mint: '#B8F0E6',
+            tealBrand: '#1A6355',
+            tealDark: '#12473D',
+            rust: '#9A4608',
+            rustHover: '#823905',
+            cardMuted: '#F3F5F4',
+          },
+        },
+      },
+    };
+  </script>
+<!-- Custom Styles for Concentric Voice Button & Gentle Pulse -->
+<style data-purpose="voice-button-rings">
+    @keyframes subtlePulse {
+      0%, 100% {
+        box-shadow: 0 0 0 12px rgba(154, 70, 8, 0.16), 0 0 0 24px rgba(154, 70, 8, 0.08), 0 0 0 36px rgba(154, 70, 8, 0.03);
+      }
+      50% {
+        box-shadow: 0 0 0 16px rgba(154, 70, 8, 0.22), 0 0 0 30px rgba(154, 70, 8, 0.11), 0 0 0 44px rgba(154, 70, 8, 0.05);
+      }
+    }
+    .voice-ring-pulsing {
+      animation: subtlePulse 3s ease-in-out infinite;
+      transition: transform 0.2s ease;
+    }
+    .voice-ring-pulsing:hover {
+      transform: scale(1.03);
+    }
+    .voice-ring-pulsing:active {
+      transform: scale(0.97);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-cream text-slate-900 font-sans antialiased flex flex-col justify-between">
+<!-- BEGIN: DesktopHeader -->
+<header class="w-full px-6 py-4 md:px-10 md:py-5 flex items-center justify-between" data-purpose="desktop-header">
+<!-- Subtle top-left branding updated for Telangana Pensions -->
+<div class="flex items-center gap-3.5" data-purpose="desktop-brand">
+<!-- Inline SVG Logo matching Sarkar-Sakhi emblem -->
+<div class="w-11 h-11 rounded-xl bg-white border border-amber-200/80 shadow-sm flex items-center justify-center shrink-0">
+<svg aria-hidden="true" class="w-7 h-7" fill="none" viewbox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+<path d="M20 7C17.5 11.5 16.5 15 20 19C23.5 15 22.5 11.5 20 7Z" fill="#E86A17"></path>
+<path d="M20 19C15 16 11.5 16.5 9.5 19.5C13.5 21.5 17 21 20 19Z" fill="#F28C28"></path>
+<path d="M20 19C25 16 28.5 16.5 30.5 19.5C26.5 21.5 23 21 20 19Z" fill="#F28C28"></path>
+<path d="M9 24.5C12.5 28.5 17 30 20 30C23 30 27.5 28.5 31 24.5C28 25.5 24 25.5 20 23.5C16 25.5 12 25.5 9 24.5Z" fill="#1A6355"></path>
+</svg>
+</div>
+<div>
+<h1 class="text-base md:text-lg font-bold tracking-tight text-tealBrand leading-tight">Sarkar-Sakhi</h1>
+<p class="text-xs md:text-sm text-slate-600 font-medium">Accessible Government Pension Assistant (Telangana)</p>
+</div>
+</div>
+<!-- Clean top-right English / తెలుగు toggle -->
+<div class="flex items-center" data-purpose="desktop-language-toggle">
+<button aria-label="Toggle language between English and Telugu" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200/90 shadow-sm text-sm font-semibold text-tealBrand hover:bg-mint/40 transition-colors focus:outline-none focus:ring-2 focus:ring-tealBrand/40" id="desktop-lang-btn" type="button">
+<svg aria-hidden="true" class="w-4 h-4 text-tealBrand" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span id="desktop-lang-label">English / తెలుగు</span>
+</button>
+</div>
+</header>
+<!-- END: DesktopHeader -->
+<!-- BEGIN: CenteredMobileShowcase -->
+<main class="flex-1 flex items-center justify-center px-4 py-4 md:py-6" data-purpose="centered-mobile-showcase">
+<!-- Crisp, high-contrast mobile frame (max-width 420px, gentle soft shadow, rounded-3xl border) -->
+<section aria-label="Sarkar-Sakhi Telangana Pension Assistant Mobile App" class="w-full max-w-[420px] bg-white rounded-3xl border border-amber-900/10 shadow-[0_20px_60px_-15px_rgba(26,99,85,0.14)] overflow-hidden flex flex-col" data-purpose="mobile-app-frame">
+<!-- BEGIN: MobileAppTopBar (Header with brand and single large language toggle, NO profile avatar) -->
+<div class="px-5 py-4 flex items-center justify-between border-b border-slate-100 bg-white" data-purpose="mobile-top-bar">
+<!-- Brand title and icon -->
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200/70 flex items-center justify-center shrink-0">
+<svg aria-hidden="true" class="w-5 h-5" fill="none" viewbox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+<path d="M20 7C17.5 11.5 16.5 15 20 19C23.5 15 22.5 11.5 20 7Z" fill="#E86A17"></path>
+<path d="M20 19C15 16 11.5 16.5 9.5 19.5C13.5 21.5 17 21 20 19Z" fill="#F28C28"></path>
+<path d="M20 19C25 16 28.5 16.5 30.5 19.5C26.5 21.5 23 21 20 19Z" fill="#F28C28"></path>
+<path d="M9 24.5C12.5 28.5 17 30 20 30C23 30 27.5 28.5 31 24.5C28 25.5 24 25.5 20 23.5C16 25.5 12 25.5 9 24.5Z" fill="#1A6355"></path>
+</svg>
+</div>
+<div class="min-w-0">
+<p class="text-base font-bold text-tealBrand leading-tight">Sarkar-Sakhi</p>
+<p class="text-xs text-slate-500 font-semibold tracking-wide">Telangana Pensions</p>
+</div>
+</div>
+<!-- Single large language toggle pill -->
+<button aria-label="Switch language between English and Telugu" class="mobile-lang-trigger inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-mint text-tealDark text-xs font-bold hover:brightness-95 active:scale-95 transition-all shadow-sm" type="button">
+<svg aria-hidden="true" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewbox="0 0 24 24">
+<path d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="mobile-lang-text font-bold">English / తెలుగు</span>
+</button>
+</div>
+<!-- END: MobileAppTopBar -->
+<!-- BEGIN: MobileAppBody -->
+<div class="p-6 flex flex-col gap-6 bg-white">
+<!-- Greeting Banner -->
+<div class="px-5 py-4 rounded-2xl bg-peach text-center border border-amber-200/50" data-purpose="greeting-banner">
+<h2 class="text-xl md:text-2xl font-extrabold text-slate-900 leading-snug" id="greeting-text">
+            Namaste! Ask about pensions.
+          </h2>
+</div>
+<!-- Primary Voice Action: Giant Pulsing Microphone Button ("Tap & Speak") -->
+<div class="py-6 flex flex-col items-center justify-center gap-6" data-purpose="voice-action-area">
+<button aria-label="Tap and Speak" class="voice-ring-pulsing w-44 h-44 rounded-full bg-rust hover:bg-rustHover text-white flex flex-col items-center justify-center gap-2 focus:outline-none focus:ring-4 focus:ring-rust/30 shadow-lg cursor-pointer" id="tap-speak-btn" type="button">
+<!-- Microphone Icon -->
+<svg aria-hidden="true" class="w-12 h-12" fill="none" stroke="currentColor" stroke-width="2.2" viewbox="0 0 24 24">
+<path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M19 10v2a7 7 0 01-14 0v-2" stroke-linecap="round" stroke-linejoin="round"></path>
+<line stroke-linecap="round" x1="12" x2="12" y1="19" y2="23"></line>
+<line stroke-linecap="round" x1="8" x2="16" y1="23" y2="23"></line>
+</svg>
+<span class="text-lg font-bold tracking-wide" id="tap-speak-label">Tap &amp; Speak</span>
+</button>
+<!-- Secondary Input: Type instead link -->
+<button class="inline-flex items-center gap-2 text-base font-bold text-tealBrand hover:text-tealDark underline decoration-tealBrand/40 hover:decoration-tealBrand underline-offset-4 py-1 px-3 transition-colors" id="type-instead-btn" type="button">
+<svg aria-hidden="true" class="w-5 h-5 text-tealBrand" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<rect height="14" rx="2" ry="2" width="20" x="2" y="5"></rect>
+<line stroke-linecap="round" x1="6" x2="6.01" y1="9" y2="9"></line>
+<line stroke-linecap="round" x1="10" x2="10.01" y1="9" y2="9"></line>
+<line stroke-linecap="round" x1="14" x2="14.01" y1="9" y2="9"></line>
+<line stroke-linecap="round" x1="18" x2="18.01" y1="9" y2="9"></line>
+<line stroke-linecap="round" x1="6" x2="6.01" y1="13" y2="13"></line>
+<line stroke-linecap="round" x1="10" x2="14" y1="13" y2="13"></line>
+<line stroke-linecap="round" x1="18" x2="18.01" y1="13" y2="13"></line>
+</svg>
+<span id="type-instead-label">Type instead</span>
+</button>
+</div>
+<!-- Play Demo CTA -->
+<button class="w-full py-4 px-5 rounded-2xl bg-tealBrand hover:bg-tealDark text-white font-bold text-base flex items-center justify-center gap-2.5 shadow-sm hover:shadow transition-all" data-purpose="play-demo-button" type="button">
+<svg aria-hidden="true" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<polygon fill="currentColor" points="10 8 16 12 10 16 10 8" stroke="none"></polygon>
+</svg>
+<span id="play-demo-label">Play demo</span>
+</button>
+<!-- Privacy Assurance Note -->
+<div class="p-4 rounded-2xl bg-cardMuted flex items-start gap-3 border border-slate-200/60" data-purpose="privacy-notice">
+<svg aria-hidden="true" class="w-5 h-5 text-tealBrand shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.2" viewbox="0 0 24 24">
+<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<p class="text-xs md:text-sm text-slate-700 font-medium leading-relaxed" id="privacy-text">
+            We don't store your answers on any server. Voice recognition is handled by your browser.
+          </p>
+</div>
+</div>
+<!-- END: MobileAppBody -->
+</section>
+</main>
+<!-- END: CenteredMobileShowcase -->
+<footer class="w-full py-3 text-center text-xs text-slate-500">
+  Accessible Government Pension Portal • Government of Telangana
+</footer>
+<!-- Interactive Language Toggle Script -->
+<script data-purpose="language-toggle">
+    (function () {
+      let isTelugu = false;
+
+      const copy = {
+        en: {
+          greeting: 'Namaste! Ask about pensions.',
+          tapSpeak: 'Tap & Speak',
+          typeInstead: 'Type instead',
+          playDemo: 'Play demo',
+          privacy: "We don't store your answers on any server. Voice recognition is handled by your browser.",
+        },
+        te: {
+          greeting: 'నమస్తే! పెన్షన్ల గురించి అడగండి.',
+          tapSpeak: 'నొక్కి మాట్లాడండి',
+          typeInstead: 'టైప్ చేయండి',
+          playDemo: 'డెమో చూడండి',
+          privacy: 'మీ సమాధానాలు ఏ సర్వర్‌లోనూ నిల్వ చేయబడవు. వాయిస్ గుర్తింపు మీ బ్రౌజర్ ద్వారానే జరుగుతుంది.',
+        },
+      };
+
+      function updateLanguage() {
+        const lang = isTelugu ? copy.te : copy.en;
+        document.getElementById('greeting-text').textContent = lang.greeting;
+        document.getElementById('tap-speak-label').textContent = lang.tapSpeak;
+        document.getElementById('type-instead-label').textContent = lang.typeInstead;
+        document.getElementById('play-demo-label').textContent = lang.playDemo;
+        document.getElementById('privacy-text').textContent = lang.privacy;
+      }
+
+      document.getElementById('desktop-lang-btn').addEventListener('click', () => {
+        isTelugu = !isTelugu;
+        updateLanguage();
+      });
+
+      document.querySelectorAll('.mobile-lang-trigger').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          isTelugu = !isTelugu;
+          updateLanguage();
+        });
+      });
+    })();
+  </script>
+</body></html>
