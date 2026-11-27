@@ -1,9 +1,8 @@
-import { UserAnswers, SchemeConfig, SchemeEvaluation, CriterionResult } from '../types';
+import type { UserAnswers, SchemeConfig, SchemeEvaluation, CriterionResult } from '../types';
 
 /**
- * Pure evaluation engine for scheme eligibility
- * Returns { qualifies, statusTextKey, matched[], unmet[], needsVerification[], requiredDocumentIds[] }
- * Never declares "eligible" - uses "may_qualify"
+ * Pure evaluation engine for scheme eligibility.
+ * Returns { qualifies, statusTextKey, matched[], unmet[], needsVerification[], requiredDocumentIds[] }.
  */
 export function evaluate(answers: UserAnswers, scheme: SchemeConfig): SchemeEvaluation {
   const matched: CriterionResult[] = [];
@@ -19,7 +18,7 @@ export function evaluate(answers: UserAnswers, scheme: SchemeConfig): SchemeEval
     if (userAgeNumeric === undefined && answers.ageRange) {
       switch (answers.ageRange) {
         case 'under_57':
-          userAgeNumeric = 50; // below 57
+          userAgeNumeric = 50;
           break;
         case '57_64':
           userAgeNumeric = 60;
@@ -57,7 +56,7 @@ export function evaluate(answers: UserAnswers, scheme: SchemeConfig): SchemeEval
     }
   }
 
-  // 2. Gender Evaluation (e.g. Widow pension targets female)
+  // 2. Gender Evaluation
   if (rules.targetGender && rules.targetGender.length > 0) {
     if (!answers.gender) {
       needsVerification.push({
@@ -80,7 +79,7 @@ export function evaluate(answers: UserAnswers, scheme: SchemeConfig): SchemeEval
     }
   }
 
-  // 3. Marital Status Evaluation (e.g. Widow pension)
+  // 3. Marital Status Evaluation
   if (rules.requiredMaritalStatus && rules.requiredMaritalStatus.length > 0) {
     if (!answers.maritalStatus) {
       needsVerification.push({
@@ -89,16 +88,24 @@ export function evaluate(answers: UserAnswers, scheme: SchemeConfig): SchemeEval
         status: 'needsVerification'
       });
     } else if (rules.requiredMaritalStatus.includes(answers.maritalStatus)) {
+      const statusLabel = answers.maritalStatus === 'widow' ? 'Widow' : 'Single / Unmarried / Separated';
       matched.push({
         id: 'maritalStatus',
-        labelKey: 'Marital status criteria met (Widow)',
+        labelKey: `Marital status criteria met (${statusLabel})`,
         status: 'matched'
       });
-      requiredDocumentIds.push('death_certificate');
+      if (answers.maritalStatus === 'widow') {
+        requiredDocumentIds.push('death_certificate');
+      } else if (scheme.id === 'telangana_single_woman') {
+        requiredDocumentIds.push('single_status_cert');
+      }
     } else {
       unmet.push({
         id: 'maritalStatus',
-        labelKey: 'Scheme specifically designated for widows',
+        labelKey:
+          scheme.id === 'telangana_widow'
+            ? 'Scheme specifically designated for widows'
+            : 'Scheme designated for unmarried, divorced, or separated women',
         status: 'unmet'
       });
     }
@@ -121,7 +128,7 @@ export function evaluate(answers: UserAnswers, scheme: SchemeConfig): SchemeEval
     } else {
       unmet.push({
         id: 'incomeBand',
-        labelKey: 'Household income exceeds demo threshold (Above ₹1.5 Lakh)',
+        labelKey: 'Household income exceeds sample threshold (Above ₹1.5 Lakh)',
         status: 'unmet'
       });
     }
@@ -150,12 +157,8 @@ export function evaluate(answers: UserAnswers, scheme: SchemeConfig): SchemeEval
     }
   }
 
-  // Overall qualification calculation:
-  // Must have 0 unmet conditions and at least one matched condition
   const qualifies = unmet.length === 0 && matched.length > 0;
   const statusTextKey = qualifies ? 'may_qualify' : 'does_not_qualify';
-
-  // Deduplicate documents
   const uniqueDocIds = Array.from(new Set(requiredDocumentIds));
 
   return {

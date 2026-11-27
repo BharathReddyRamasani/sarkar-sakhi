@@ -4,7 +4,7 @@ import { UI_TRANSLATIONS, SCHEMES } from '../config/content';
 import { HearAgainButton } from '../components/HearAgainButton';
 
 export const ResultsScreen: React.FC = () => {
-  const { language, evaluations, setCurrentScreen } = useApp();
+  const { language, evaluations, setCurrentScreen, updateFormField } = useApp();
   const t = UI_TRANSLATIONS[language];
 
   const fullAudioSummary = evaluations
@@ -14,6 +14,13 @@ export const ResultsScreen: React.FC = () => {
       return `${scheme.name[language]}: ${status}. ${scheme.amountText[language]}.`;
     })
     .join(' ');
+
+  const handleOpenForm = (schemeId?: string) => {
+    if (schemeId) {
+      updateFormField('selectedSchemeId', schemeId);
+    }
+    setCurrentScreen('application_form');
+  };
 
   return (
     <div className="flex flex-col gap-6 py-4 animate-fadeIn">
@@ -49,15 +56,13 @@ export const ResultsScreen: React.FC = () => {
                     : 'bg-surface-container-high text-on-surface-variant'
                 }`}
               >
-                {/* Mandatory Disclaimer Badge */}
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-lowest text-on-surface font-bold text-[14px] shadow-sm">
                   <span className="material-symbols-outlined text-[18px] text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>
                     info
                   </span>
-                  <span>{t.demoBadge}</span>
+                  <span>{t.sampleBadge}</span>
                 </div>
 
-                {/* Qualification badge: Always 'May qualify', never 'eligible' */}
                 <div className="inline-flex items-center gap-1 font-bold text-[17px]">
                   <span
                     className="material-symbols-outlined text-[24px]"
@@ -94,7 +99,6 @@ export const ResultsScreen: React.FC = () => {
 
                 {/* Matched / Unmet conditions breakdown */}
                 <div className="flex flex-col gap-2 p-3 bg-surface-container-low rounded-xl">
-                  {/* Matched */}
                   {evaluation.matched.map((m, idx) => (
                     <div key={idx} className="flex items-center gap-2.5 text-[16px] text-on-surface font-medium">
                       <span className="material-symbols-outlined text-secondary text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>
@@ -104,7 +108,6 @@ export const ResultsScreen: React.FC = () => {
                     </div>
                   ))}
 
-                  {/* Unmet */}
                   {evaluation.unmet.map((u, idx) => (
                     <div key={idx} className="flex items-center gap-2.5 text-[16px] text-error font-medium">
                       <span className="material-symbols-outlined text-[24px]">cancel</span>
@@ -112,7 +115,6 @@ export const ResultsScreen: React.FC = () => {
                     </div>
                   ))}
 
-                  {/* Needs Verification */}
                   {evaluation.needsVerification.map((v, idx) => (
                     <div key={idx} className="flex items-center gap-2.5 text-[16px] text-primary font-medium">
                       <span className="material-symbols-outlined text-[24px]">help</span>
@@ -121,7 +123,17 @@ export const ResultsScreen: React.FC = () => {
                   ))}
                 </div>
 
-                {/* Confirm note */}
+                {isEligible && (
+                  <button
+                    type="button"
+                    onClick={() => handleOpenForm(evaluation.schemeId)}
+                    className="w-full min-h-[56px] px-4 rounded-xl bg-primary text-on-primary font-bold text-[18px] flex items-center justify-center gap-2 shadow-sm active:scale-95 transition-transform"
+                  >
+                    <span className="material-symbols-outlined text-[24px]">edit_document</span>
+                    <span>{t.fillFormCta}</span>
+                  </button>
+                )}
+
                 <div className="text-[14px] text-on-surface-variant italic">
                   * {scheme.disclaimer[language]}
                 </div>
@@ -131,15 +143,26 @@ export const ResultsScreen: React.FC = () => {
         })}
       </div>
 
-      {/* Large CTA: Proceed to Document Checklist */}
-      <button
-        type="button"
-        onClick={() => setCurrentScreen('checklist')}
-        className="w-full min-h-[64px] px-6 rounded-2xl bg-primary text-on-primary font-bold text-[21px] flex items-center justify-center gap-3 shadow-lg active:scale-95 transition-transform"
-      >
-        <span className="material-symbols-outlined text-[30px]">fact_check</span>
-        <span>{t.viewChecklistCta}</span>
-      </button>
+      {/* Primary Action Buttons */}
+      <div className="flex flex-col gap-3">
+        <button
+          type="button"
+          onClick={() => handleOpenForm()}
+          className="w-full min-h-[64px] px-6 rounded-2xl bg-primary text-on-primary font-bold text-[21px] flex items-center justify-center gap-3 shadow-lg active:scale-95 transition-transform"
+        >
+          <span className="material-symbols-outlined text-[30px]">edit_document</span>
+          <span>{t.fillFormCta}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setCurrentScreen('checklist')}
+          className="w-full min-h-[56px] px-6 rounded-2xl bg-secondary-container text-on-secondary-container font-bold text-[19px] flex items-center justify-center gap-2 shadow-sm border border-secondary/20 active:scale-95 transition-transform"
+        >
+          <span className="material-symbols-outlined text-[26px]">fact_check</span>
+          <span>{t.viewChecklistCta}</span>
+        </button>
+      </div>
     </div>
   );
 };

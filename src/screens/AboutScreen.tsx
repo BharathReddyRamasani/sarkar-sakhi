@@ -32,16 +32,16 @@ export const AboutScreen: React.FC = () => {
           {t.privacyNote}
         </p>
         <ul className="list-disc list-inside text-[15px] text-on-surface-variant space-y-1">
-          <li>{language === 'te' ? 'ఆధార్ సంఖ్య అడగబడదు' : 'No Aadhaar number is collected.'}</li>
-          <li>{language === 'te' ? 'ఫోన్ నంబర్ లేదా బ్యాంక్ వివరాలు నిల్వ చేయబడవు' : 'No phone number or bank details stored.'}</li>
-          <li>{language === 'te' ? 'బ్రౌజర్ మెమొరీలో మాత్రమే తాత్కాలికంగా ఉంటుంది' : 'Stored in local device memory only.'}</li>
+          <li>{language === 'te' ? 'ఆధార్ సంఖ్య అడగబడదు' : 'No Aadhaar number is requested or collected.'}</li>
+          <li>{language === 'te' ? 'ఫోన్ నంబర్ లేదా బ్యాంక్ ఖాతా వివరాలు సర్వర్‌లో నిల్వ చేయబడవు' : 'No phone number or bank details sent to any server.'}</li>
+          <li>{language === 'te' ? 'మీ డివైజ్ బ్రౌజర్ మెమొరీలో మాత్రమే ఉంటుంది' : 'Drafts stay strictly in your device localStorage.'}</li>
         </ul>
       </div>
 
       <div className="bg-primary-fixed/30 rounded-2xl p-5 flex flex-col gap-2 border border-primary/20">
         <h2 className="font-bold text-[18px] text-primary flex items-center gap-2">
-          <span className="material-symbols-outlined text-[22px]">warning</span>
-          {t.demoBadge}
+          <span className="material-symbols-outlined text-[22px]">fact_check</span>
+          {t.sampleBadge}
         </h2>
         <p className="text-[15px] text-on-surface">
           {t.disclaimerCard}

@@ -15,6 +15,17 @@ export interface UserAnswers {
   receivingPension?: ExistingPension;
 }
 
+export interface ApplicationFormData {
+  selectedSchemeId?: string;
+  applicantName: string;
+  guardianName: string;
+  district: string;
+  mandal: string;
+  village: string;
+  rationCardAvailable: 'yes' | 'no' | '';
+  bankAadhaarLinked: 'yes' | 'no' | '';
+}
+
 export type EvaluationStatus = 'matched' | 'unmet' | 'needsVerification';
 
 export interface CriterionResult {
@@ -27,7 +38,7 @@ export interface CriterionResult {
 export interface SchemeEvaluation {
   schemeId: string;
   qualifies: boolean;
-  statusTextKey: string; // e.g. "may_qualify", "does_not_qualify"
+  statusTextKey: string; // "may_qualify" | "does_not_qualify"
   matched: CriterionResult[];
   unmet: CriterionResult[];
   needsVerification: CriterionResult[];
@@ -36,7 +47,7 @@ export interface SchemeEvaluation {
 
 export interface DocumentItem {
   id: string;
-  requiredFor: string[]; // schemeIds or condition strings e.g. 'widow'
+  requiredFor: string[]; // schemeIds
   names: Record<Language, string>;
   descriptions: Record<Language, string>;
   icon: string;
@@ -61,10 +72,10 @@ export interface SchemeConfig {
   name: Record<Language, string>;
   alias: Record<Language, string>;
   description: Record<Language, string>;
-  amountText: Record<Language, string>; // "Check with official office"
+  amountText: Record<Language, string>;
   disclaimer: Record<Language, string>;
   icon: string;
-  // VERIFY with official Telangana Aasara sources
+  // Modify thresholds in src/config/content.ts to match official state rules
   rules: {
     minAge?: number;
     targetGender?: Gender[];
@@ -79,14 +90,4 @@ export interface OfficeInfo {
   description: Record<Language, string>;
   places: Record<Language, string[]>;
   hours: Record<Language, string>;
-}
-
-export interface DemoStep {
-  screen: string;
-  stepIndex: number;
-  answerField: keyof UserAnswers;
-  answerValue: any;
-  speechText: Record<Language, string>;
-  caption: Record<Language, string>;
-  delayMs: number;
 }

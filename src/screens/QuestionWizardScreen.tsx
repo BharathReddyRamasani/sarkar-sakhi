@@ -1,26 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { UI_TRANSLATIONS, QUESTIONS } from '../config/content';
 import { VoiceInput } from '../components/VoiceInput';
 import { HearAgainButton } from '../components/HearAgainButton';
 import { mapSpeechToOption } from '../engine/speechMatcher';
-import { UserAnswers } from '../types';
+import type { UserAnswers } from '../types';
 
 interface QuestionWizardProps {
   questionIndex: number;
 }
 
 export const QuestionWizardScreen: React.FC<QuestionWizardProps> = ({ questionIndex }) => {
-  const { language, answers, updateAnswer, setCurrentScreen } = useApp();
+  const { language, answers, updateAnswer, setCurrentScreen, autoSpeak, voice } = useApp();
+  const { speak } = voice;
   const t = UI_TRANSLATIONS[language];
 
   const totalQuestions = QUESTIONS.length;
   const question = QUESTIONS[questionIndex];
 
-  // Specific state for exact age entry toggle
   const [showExactAgeInput, setShowExactAgeInput] = useState(false);
   const [exactAgeVal, setExactAgeVal] = useState<string>(answers.age ? String(answers.age) : '');
   const [voiceMismatch, setVoiceMismatch] = useState(false);
+
+  const speechText = question ? `${question.title[language]}. ${question.speechPrompt[language]}` : '';
+
+  useEffect(() => {
+    if (autoSpeak && speechText) {
+      speak(speechText);
+    }
+  }, [questionIndex, language, autoSpeak, speechText, speak]);
 
   if (!question) {
     return <div>Question not found</div>;
@@ -79,8 +87,6 @@ export const QuestionWizardScreen: React.FC<QuestionWizardProps> = ({ questionIn
     }
   };
 
-  const speechText = `${question.title[language]}. ${question.speechPrompt[language]}`;
-
   return (
     <div className="flex flex-col gap-5 py-3 animate-fadeIn">
       {/* Step Progress Dots */}
@@ -136,7 +142,7 @@ export const QuestionWizardScreen: React.FC<QuestionWizardProps> = ({ questionIn
         )}
       </div>
 
-      {/* Tap Answer Cards (min-h-[72px], high contrast) */}
+      {/* Tap Answer Cards */}
       <div
         role="radiogroup"
         aria-label={question.title[language]}
@@ -186,7 +192,7 @@ export const QuestionWizardScreen: React.FC<QuestionWizardProps> = ({ questionIn
         })}
       </div>
 
-      {/* Exact Age Entry Toggle for Age Question */}
+      {/* Exact Age Entry Toggle */}
       {question.id === 'age' && (
         <div className="mt-2 p-4 bg-surface-container-lowest rounded-2xl border border-outline-variant/40 flex flex-col gap-3">
           <button
@@ -196,11 +202,7 @@ export const QuestionWizardScreen: React.FC<QuestionWizardProps> = ({ questionIn
           >
             <span className="flex items-center gap-2">
               <span className="material-symbols-outlined text-[24px]">pin</span>
-              {language === 'te'
-                ? 'ఖచ్చితమైన వయస్సు రాయాలనుకుంటున్నారా?'
-                : language === 'hi'
-                ? 'क्या आप सटीक आयु दर्ज करना चाहते हैं?'
-                : 'Want to enter exact age number?'}
+              {t.exactAgeToggle}
             </span>
             <span className="material-symbols-outlined">
               {showExactAgeInput ? 'expand_less' : 'expand_more'}
@@ -215,7 +217,7 @@ export const QuestionWizardScreen: React.FC<QuestionWizardProps> = ({ questionIn
                 max="120"
                 value={exactAgeVal}
                 onChange={(e) => setExactAgeVal(e.target.value)}
-                placeholder={language === 'te' ? 'ఉదా: 68' : 'e.g. 68'}
+                placeholder={t.exactAgePlaceholder}
                 className="flex-1 min-h-[56px] px-4 rounded-xl border border-outline bg-surface text-on-surface text-[22px] font-bold focus:outline-primary"
                 aria-label="Enter exact age"
               />

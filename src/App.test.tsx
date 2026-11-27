@@ -4,7 +4,7 @@ import App from './App';
 import { AppProvider } from './context/AppContext';
 
 describe('App Smoke and Accessibility Test', () => {
-  it('renders home screen with Telugu heading and voice button by default', () => {
+  it('renders home screen with Telugu heading, voice button, and live start action', () => {
     render(
       <AppProvider>
         <App />
@@ -13,10 +13,10 @@ describe('App Smoke and Accessibility Test', () => {
 
     // Verify Title & Telugu greeting are present
     expect(screen.getByText('సర్కార్-సఖి')).toBeInTheDocument();
-    expect(screen.getByText('నమస్తే! పింఛన్ల గురించి అడగండి.')).toBeInTheDocument();
+    expect(screen.getByText('నమస్తే! పింఛను గురించి అడగండి.')).toBeInTheDocument();
 
-    // Verify accessible action buttons exist
+    // Verify accessible live voice & start buttons exist
     expect(screen.getByRole('button', { name: /మాట్లాడండి/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /డెమో చూడండి/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /ప్రారంభించండి/i })).toBeInTheDocument();
   });
 });

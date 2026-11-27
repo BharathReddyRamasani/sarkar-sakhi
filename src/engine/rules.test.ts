@@ -1,15 +1,15 @@
 import { describe, it, expect } from 'vitest';
 import { evaluate } from './rules';
 import { SCHEMES } from '../config/content';
-import { UserAnswers } from '../types';
+import type { UserAnswers } from '../types';
 
 describe('Rules Engine - evaluate()', () => {
   const oldAgeScheme = SCHEMES.telangana_old_age;
   const widowScheme = SCHEMES.telangana_widow;
+  const singleWomanScheme = SCHEMES.telangana_single_woman;
 
-  // 1. Lakshmamma Persona (68-year-old widow, female, low income, no existing pension)
-  it('correctly evaluates Lakshmamma (68 yrs, widow, BPL, no prior pension)', () => {
-    const lakshmammaAnswers: UserAnswers = {
+  it('correctly evaluates 68-year-old widow with low income and no prior pension', () => {
+    const answers: UserAnswers = {
       age: 68,
       ageRange: '65_79',
       gender: 'female',
@@ -18,8 +18,7 @@ describe('Rules Engine - evaluate()', () => {
       receivingPension: 'no'
     };
 
-    // Should qualify for Old-Age Pension
-    const oldAgeResult = evaluate(lakshmammaAnswers, oldAgeScheme);
+    const oldAgeResult = evaluate(answers, oldAgeScheme);
     expect(oldAgeResult.qualifies).toBe(true);
     expect(oldAgeResult.statusTextKey).toBe('may_qualify');
     expect(oldAgeResult.unmet).toHaveLength(0);
@@ -27,8 +26,7 @@ describe('Rules Engine - evaluate()', () => {
     expect(oldAgeResult.requiredDocumentIds).toContain('age_proof');
     expect(oldAgeResult.requiredDocumentIds).toContain('aadhaar');
 
-    // Should also qualify for Widow Pension
-    const widowResult = evaluate(lakshmammaAnswers, widowScheme);
+    const widowResult = evaluate(answers, widowScheme);
     expect(widowResult.qualifies).toBe(true);
     expect(widowResult.statusTextKey).toBe('may_qualify');
     expect(widowResult.unmet).toHaveLength(0);
@@ -36,7 +34,6 @@ describe('Rules Engine - evaluate()', () => {
     expect(widowResult.requiredDocumentIds).toContain('ration_card');
   });
 
-  // 2. Edge Case: Young widow (Age 32, female, widow, BPL, no existing pension)
   it('young widow qualifies for Widow Pension but NOT Old-Age Pension', () => {
     const youngWidow: UserAnswers = {
       age: 32,
@@ -57,7 +54,22 @@ describe('Rules Engine - evaluate()', () => {
     expect(widowResult.requiredDocumentIds).toContain('death_certificate');
   });
 
-  // 3. Edge Case: Already receiving a pension
+  it('separated/unmarried low-income woman qualifies for Single Woman Pension', () => {
+    const singleWoman: UserAnswers = {
+      age: 40,
+      ageRange: 'under_57',
+      gender: 'female',
+      maritalStatus: 'separated',
+      incomeBand: 'below_1_5_lakh',
+      receivingPension: 'no'
+    };
+
+    const singleRes = evaluate(singleWoman, singleWomanScheme);
+    expect(singleRes.qualifies).toBe(true);
+    expect(singleRes.requiredDocumentIds).toContain('single_status_cert');
+    expect(evaluate(singleWoman, widowScheme).qualifies).toBe(false);
+  });
+
   it('disqualifies candidate who already receives another pension', () => {
     const existingPensioner: UserAnswers = {
       age: 72,
@@ -73,7 +85,6 @@ describe('Rules Engine - evaluate()', () => {
     expect(oldAgeResult.unmet.some((u) => u.id === 'receivingPension')).toBe(true);
   });
 
-  // 4. Edge Case: High income
   it('disqualifies candidate whose household income is above limit', () => {
     const highIncomeApplicant: UserAnswers = {
       age: 62,
@@ -89,7 +100,6 @@ describe('Rules Engine - evaluate()', () => {
     expect(oldAgeResult.unmet.some((u) => u.id === 'incomeBand')).toBe(true);
   });
 
-  // 5. Edge Case: Unknown income (marks as needsVerification instead of hard reject)
   it('marks unknown income as needsVerification', () => {
     const unsureApplicant: UserAnswers = {
       age: 60,
@@ -105,7 +115,6 @@ describe('Rules Engine - evaluate()', () => {
     expect(oldAgeResult.needsVerification.some((v) => v.id === 'incomeBand')).toBe(true);
   });
 
-  // 6. Male applicant for widow pension
   it('disqualifies male applicant for widow pension', () => {
     const maleApplicant: UserAnswers = {
       age: 65,

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Language } from '../types';
+import type { Language } from '../types';
 
 export interface UseVoiceSpeechReturn {
   isSupported: boolean;
@@ -7,7 +7,7 @@ export interface UseVoiceSpeechReturn {
   transcript: string;
   setTranscript: (text: string) => void;
   error: 'none' | 'not-supported' | 'permission-denied' | 'no-speech' | 'network';
-  startListening: () => void;
+  startListening: (onFinished?: (finalText: string) => void) => void;
   stopListening: () => void;
   speak: (text: string) => void;
   stopSpeaking: () => void;
@@ -36,8 +36,9 @@ export function useVoiceSpeech(language: Language): UseVoiceSpeechReturn {
 
   const recognitionRef = useRef<any>(null);
   const synthRef = useRef<SpeechSynthesis | null>(null);
+  const latestTranscriptRef = useRef('');
+  const onFinishedRef = useRef<((finalText: string) => void) | undefined>(undefined);
 
-  // Feature detection
   const isSpeechRecognitionSupported = typeof window !== 'undefined' &&
     ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
@@ -74,7 +75,6 @@ export function useVoiceSpeech(language: Language): UseVoiceSpeechReturn {
   const speak = useCallback((text: string) => {
     if (!synthRef.current || !text) return;
 
-    // Clean text for speech (remove markdown symbols or brackets)
     const cleanText = text
       .replace(/[#*_~`[\]()]/g, ' ')
       .replace(/\s+/g, ' ')
@@ -84,10 +84,9 @@ export function useVoiceSpeech(language: Language): UseVoiceSpeechReturn {
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = getBcp47(language);
-    utterance.rate = 0.9; // Slightly slower for elderly comprehension
+    utterance.rate = 0.92;
     utterance.pitch = 1.0;
 
-    // Pick best matching voice if available
     const voices = synthRef.current.getVoices();
     const matchedVoice = voices.find(v => v.lang === getBcp47(language)) ||
                          voices.find(v => v.lang.startsWith(language));
@@ -102,17 +101,30 @@ export function useVoiceSpeech(language: Language): UseVoiceSpeechReturn {
     synthRef.current.speak(utterance);
   }, [language, stopSpeaking]);
 
-  const startListening = useCallback(() => {
+  const setTranscriptSafe = useCallback((text: string) => {
+    latestTranscriptRef.current = text;
+    setTranscript(text);
+  }, []);
+
+  const startListening = useCallback((onFinished?: (finalText: string) => void) => {
     if (!isSpeechRecognitionSupported) {
       setError('not-supported');
       return;
     }
 
-    // Stop speaking before listening
     stopSpeaking();
     setError('none');
+    latestTranscriptRef.current = '';
+    setTranscript('');
+    onFinishedRef.current = onFinished;
 
     try {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch {}
+      }
+
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       const recognition = new SpeechRecognition();
       recognitionRef.current = recognition;
@@ -131,6 +143,7 @@ export function useVoiceSpeech(language: Language): UseVoiceSpeechReturn {
         for (let i = 0; i < event.results.length; ++i) {
           fullTranscript += event.results[i][0].transcript;
         }
+        latestTranscriptRef.current = fullTranscript;
         setTranscript(fullTranscript);
       };
 
@@ -147,6 +160,12 @@ export function useVoiceSpeech(language: Language): UseVoiceSpeechReturn {
 
       recognition.onend = () => {
         setIsListening(false);
+        const finalText = latestTranscriptRef.current.trim();
+        if (finalText && onFinishedRef.current) {
+          const cb = onFinishedRef.current;
+          onFinishedRef.current = undefined;
+          cb(finalText);
+        }
       };
 
       recognition.start();
@@ -167,7 +186,7 @@ export function useVoiceSpeech(language: Language): UseVoiceSpeechReturn {
     isSupported: isSpeechRecognitionSupported,
     isListening,
     transcript,
-    setTranscript,
+    setTranscript: setTranscriptSafe,
     error,
     startListening,
     stopListening,

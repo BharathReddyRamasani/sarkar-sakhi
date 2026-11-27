@@ -7,7 +7,7 @@ export const Footer: React.FC = () => {
   const t = UI_TRANSLATIONS[language];
 
   return (
-    <footer className="mt-auto border-t border-surface-container-high bg-surface-container-low/70 py-6 px-4">
+    <footer className="mt-auto border-t border-surface-container-high bg-surface-container-low/70 py-6 px-4 print:hidden">
       <div className="max-w-xl mx-auto flex flex-col items-center text-center gap-3">
         <div className="flex items-center gap-2 text-on-surface-variant text-[15px] font-medium">
           <span className="material-symbols-outlined text-[20px] text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>

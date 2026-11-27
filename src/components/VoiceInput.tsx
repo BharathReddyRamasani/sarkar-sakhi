@@ -17,11 +17,12 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
   const handleToggleListening = () => {
     if (voice.isListening) {
       voice.stopListening();
-      if (voice.transcript && onTranscriptSubmitted) {
-        onTranscriptSubmitted(voice.transcript);
-      }
     } else {
-      voice.startListening();
+      voice.startListening((finalText) => {
+        if (onTranscriptSubmitted && finalText) {
+          onTranscriptSubmitted(finalText);
+        }
+      });
     }
   };
 
@@ -29,21 +30,21 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
     <div className="flex flex-col items-center gap-4 w-full py-2">
       {/* Voice notice / error alerts */}
       {voice.error === 'not-supported' && (
-        <div className="w-full p-4 rounded-xl bg-surface-container-high border-l-4 border-primary flex items-start gap-3 text-left">
+        <div className="w-full p-4 rounded-xl bg-surface-container-high border-l-4 border-primary flex items-start gap-3 text-left" role="alert">
           <span className="material-symbols-outlined text-primary text-[26px]">info</span>
           <p className="text-[17px] text-on-surface">{t.voiceNotSupported}</p>
         </div>
       )}
 
       {voice.error === 'permission-denied' && (
-        <div className="w-full p-4 rounded-xl bg-error-container text-on-error-container flex items-start gap-3 text-left">
+        <div className="w-full p-4 rounded-xl bg-error-container text-on-error-container flex items-start gap-3 text-left" role="alert">
           <span className="material-symbols-outlined text-[26px]">mic_off</span>
           <p className="text-[17px] font-medium">{t.voiceNoMic}</p>
         </div>
       )}
 
       {voice.error === 'no-speech' && (
-        <div className="w-full p-3 rounded-xl bg-surface-container-low text-on-surface-variant flex items-center gap-2">
+        <div className="w-full p-3 rounded-xl bg-surface-container-low text-on-surface-variant flex items-center gap-2" role="status">
           <span className="material-symbols-outlined text-[24px]">help</span>
           <p className="text-[16px]">{t.voiceNoMatch}</p>
         </div>
@@ -75,7 +76,7 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
           onClick={handleToggleListening}
           aria-label={voice.isListening ? t.listening : t.tapToSpeak}
           aria-pressed={voice.isListening}
-          className={`relative w-36 h-36 min-h-[56px] min-w-[56px] rounded-full shadow-2xl flex flex-col items-center justify-center gap-1.5 transition-transform active:scale-95 focus-visible:outline-secondary ${
+          className={`relative w-36 h-36 min-h-[56px] min-w-[56px] rounded-full shadow-2xl flex flex-col items-center justify-center gap-1.5 transition-transform active:scale-95 focus-visible:outline-secondary px-2 ${
             voice.isListening
               ? 'bg-error text-on-error ring-8 ring-error/30'
               : 'bg-primary text-on-primary hover:bg-primary-container'
@@ -85,9 +86,9 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
             className="material-symbols-outlined text-[54px]"
             style={{ fontVariationSettings: "'FILL' 1" }}
           >
-            {voice.isListening ? 'mic' : 'mic'}
+            mic
           </span>
-          <span className="text-[18px] font-bold tracking-wide">
+          <span className="text-[17px] font-bold tracking-wide leading-tight text-center">
             {voice.isListening ? t.listening : t.tapToSpeak}
           </span>
         </button>
@@ -106,13 +107,7 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
               type="text"
               value={voice.transcript}
               onChange={(e) => voice.setTranscript(e.target.value)}
-              placeholder={
-                language === 'te'
-                  ? 'మీ సమాధానం ఇక్కడ కనిపిస్తుంది...'
-                  : language === 'hi'
-                  ? 'आपका उत्तर यहाँ दिखाई देगा...'
-                  : 'Your spoken words will appear here...'
-              }
+              placeholder={t.transcriptPlaceholder}
               className="flex-1 min-h-[52px] px-3 rounded-lg border border-outline-variant bg-surface text-on-surface text-[18px] focus:outline-primary"
             />
             {onTranscriptSubmitted && voice.transcript && (

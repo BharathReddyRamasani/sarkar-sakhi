@@ -4,17 +4,15 @@ import { UI_TRANSLATIONS, SCHEMES, DOCUMENTS, OFFICE_INFO } from '../config/cont
 import { HearAgainButton } from '../components/HearAgainButton';
 
 export const NextStepsScreen: React.FC = () => {
-  const { language, evaluations, checkedDocs, restart } = useApp();
+  const { language, answers, formData, evaluations, checkedDocs, restart } = useApp();
   const t = UI_TRANSLATIONS[language];
   const [copied, setCopied] = useState(false);
 
-  // Generate local share summary
   const qualifying = evaluations.filter((e) => e.qualifies);
   const schemesText = qualifying.length > 0
     ? qualifying.map((q) => SCHEMES[q.schemeId].name[language]).join(', ')
     : (language === 'te' ? 'ధృవీకరణ అవసరం' : 'Verification Needed');
 
-  // Documents status
   const docNamesReady: string[] = [];
   const docNamesMissing: string[] = [];
 
@@ -35,21 +33,32 @@ export const NextStepsScreen: React.FC = () => {
   });
 
   const generateShareSummary = () => {
+    const applicantLine = formData.applicantName ? `Applicant: ${formData.applicantName}\n` : '';
+    const locationParts = [formData.village, formData.mandal, formData.district].filter(Boolean);
+    const locationLine = locationParts.length > 0 ? `Location: ${locationParts.join(', ')}\n` : '';
+    const ageLine = answers.age ? `Age: ${answers.age}\n` : '';
+
     if (language === 'te') {
       return (
         `*సర్కార్-సఖి: పింఛను దరఖాస్తు సన్నద్ధత సారాంశం*\n` +
-        `సంభావ్య పథకాలు: ${schemesText}\n\n` +
-        `సిద్ధంగా ఉన్న పత్రాలు (${docNamesReady.length}):\n${docNamesReady.map((d) => `✓ ${d}`).join('\n')}\n\n` +
-        `సేకరించవలసిన పత్రాలు (${docNamesMissing.length}):\n${docNamesMissing.map((d) => `○ ${d}`).join('\n')}\n\n` +
+        `సంభావ్య పథకాలు: ${schemesText}\n` +
+        (formData.applicantName ? `దరఖాస్తుదారు: ${formData.applicantName}\n` : '') +
+        (locationParts.length > 0 ? `ప్రాంతం: ${locationParts.join(', ')}\n` : '') +
+        (answers.age ? `వయస్సు: ${answers.age}\n` : '') +
+        `\nసిద్ధంగా ఉన్న పత్రాలు (${docNamesReady.length}):\n${docNamesReady.map((d) => `✓ ${d}`).join('\n') || '—'}\n\n` +
+        `సేకరించవలసిన పత్రాలు (${docNamesMissing.length}):\n${docNamesMissing.map((d) => `○ ${d}`).join('\n') || '—'}\n\n` +
         `ఎక్కడికి వెళ్ళాలి: ${OFFICE_INFO.places.te[0]}\n` +
         `గమనిక: మండల కార్యాలయం లేదా మీసేవ వద్ద నిర్ధారించుకోండి.`
       );
     } else {
       return (
         `*Sarkar-Sakhi: Pension Readiness Summary*\n` +
-        `Schemes: ${schemesText}\n\n` +
-        `Ready Documents (${docNamesReady.length}):\n${docNamesReady.map((d) => `✓ ${d}`).join('\n')}\n\n` +
-        `Documents to Collect (${docNamesMissing.length}):\n${docNamesMissing.map((d) => `○ ${d}`).join('\n')}\n\n` +
+        `Schemes: ${schemesText}\n` +
+        applicantLine +
+        locationLine +
+        ageLine +
+        `\nReady Documents (${docNamesReady.length}):\n${docNamesReady.map((d) => `✓ ${d}`).join('\n') || '—'}\n\n` +
+        `Documents to Collect (${docNamesMissing.length}):\n${docNamesMissing.map((d) => `○ ${d}`).join('\n') || '—'}\n\n` +
         `Where to Visit: ${OFFICE_INFO.places.en[0]}\n` +
         `Note: Confirm locally at your Mandal office or MeeSeva.`
       );
@@ -73,7 +82,6 @@ export const NextStepsScreen: React.FC = () => {
       }
     } catch {}
 
-    // Fallback: Web Share API if available
     if (navigator.share) {
       try {
         await navigator.share({
@@ -104,7 +112,6 @@ export const NextStepsScreen: React.FC = () => {
 
       {/* 3 Numbered Steps */}
       <div className="flex flex-col gap-3 text-left">
-        {/* Step 1 */}
         <div className="bg-surface-container-lowest rounded-2xl p-4 shadow-sm border border-outline-variant/30 flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl bg-primary text-on-primary font-bold text-[24px] flex items-center justify-center shrink-0 shadow-sm">
             1
@@ -118,7 +125,6 @@ export const NextStepsScreen: React.FC = () => {
           </span>
         </div>
 
-        {/* Step 2 */}
         <div className="bg-surface-container-lowest rounded-2xl p-4 shadow-sm border border-outline-variant/30 flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl bg-secondary text-on-secondary font-bold text-[24px] flex items-center justify-center shrink-0 shadow-sm">
             2
@@ -132,7 +138,6 @@ export const NextStepsScreen: React.FC = () => {
           </span>
         </div>
 
-        {/* Step 3 */}
         <div className="bg-surface-container-lowest rounded-2xl p-4 shadow-sm border border-outline-variant/30 flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl bg-primary text-on-primary font-bold text-[24px] flex items-center justify-center shrink-0 shadow-sm">
             3
@@ -177,9 +182,8 @@ export const NextStepsScreen: React.FC = () => {
         </p>
       </div>
 
-      {/* Sharing Buttons: WhatsApp & Copy */}
+      {/* Sharing Buttons */}
       <div className="flex flex-col gap-3 mt-2">
-        {/* WhatsApp Share Button */}
         <button
           type="button"
           onClick={handleShareWhatsApp}
@@ -189,7 +193,6 @@ export const NextStepsScreen: React.FC = () => {
           <span>{t.shareWhatsAppCta}</span>
         </button>
 
-        {/* Copy Button */}
         <button
           type="button"
           onClick={handleCopySummary}
@@ -201,7 +204,6 @@ export const NextStepsScreen: React.FC = () => {
           <span>{copied ? t.copiedNotice : t.copySummaryCta}</span>
         </button>
 
-        {/* Start Fresh */}
         <button
           type="button"
           onClick={restart}

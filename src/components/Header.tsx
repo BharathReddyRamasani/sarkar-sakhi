@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { UI_TRANSLATIONS } from '../config/content';
 
 export const Header: React.FC = () => {
-  const { language, setLanguage, currentScreen, setCurrentScreen, isDemoActive, stopDemo } = useApp();
+  const { language, setLanguage, currentScreen, setCurrentScreen, autoSpeak, setAutoSpeak } = useApp();
   const t = UI_TRANSLATIONS[language];
 
   const handleBack = () => {
@@ -31,8 +31,11 @@ export const Header: React.FC = () => {
       case 'results':
         setCurrentScreen('question_receivingPension');
         break;
-      case 'checklist':
+      case 'application_form':
         setCurrentScreen('results');
+        break;
+      case 'checklist':
+        setCurrentScreen('application_form');
         break;
       case 'next_steps':
         setCurrentScreen('checklist');
@@ -54,9 +57,11 @@ export const Header: React.FC = () => {
       case 'question_maritalStatus':
       case 'question_incomeBand':
       case 'question_receivingPension':
-        return 'ప్రశ్న / Question';
+        return t.questionHeaderLabel;
       case 'results':
         return t.schemesHeading;
+      case 'application_form':
+        return t.formHeading;
       case 'checklist':
         return t.checklistHeading;
       case 'next_steps':
@@ -79,7 +84,7 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-surface/95 backdrop-blur-md shadow-[0_1px_6px_rgba(0,0,0,0.06)] border-b border-surface-container-high pt-safe">
+    <header className="sticky top-0 z-50 bg-surface/95 backdrop-blur-md shadow-[0_1px_6px_rgba(0,0,0,0.06)] border-b border-surface-container-high pt-safe print:hidden">
       <div className="h-20 max-w-xl mx-auto px-4 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           {currentScreen !== 'home' ? (
@@ -101,6 +106,12 @@ export const Header: React.FC = () => {
           <div
             className="flex flex-col min-w-0 cursor-pointer"
             onClick={() => setCurrentScreen('home')}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setCurrentScreen('home');
+              }
+            }}
             tabIndex={0}
             role="button"
             aria-label={`${t.appTitle} Home`}
@@ -116,18 +127,25 @@ export const Header: React.FC = () => {
 
         {/* Right side controls */}
         <div className="flex items-center gap-2 shrink-0">
-          {isDemoActive && (
-            <button
-              onClick={stopDemo}
-              className="min-h-[48px] px-3 rounded-full bg-error text-on-error font-bold text-[15px] flex items-center gap-1 shadow-sm active:scale-95"
-              aria-label={t.stopDemo}
-            >
-              <span className="material-symbols-outlined text-[20px]">stop_circle</span>
-              <span>{t.stopDemo}</span>
-            </button>
-          )}
+          {/* Auto-speak Voice Guide Toggle */}
+          <button
+            type="button"
+            aria-label={autoSpeak ? t.voiceGuideOn : t.voiceGuideOff}
+            aria-pressed={autoSpeak}
+            onClick={() => setAutoSpeak(!autoSpeak)}
+            title={autoSpeak ? t.voiceGuideOn : t.voiceGuideOff}
+            className={`min-h-[52px] min-w-[52px] px-2.5 rounded-full flex items-center justify-center shadow-sm active:scale-95 transition-all border ${
+              autoSpeak
+                ? 'bg-primary-fixed text-on-primary-fixed border-primary/30'
+                : 'bg-surface-container-high text-on-surface-variant border-outline-variant'
+            }`}
+          >
+            <span className="material-symbols-outlined text-[24px]">
+              {autoSpeak ? 'volume_up' : 'volume_off'}
+            </span>
+          </button>
 
-          {/* Language Switcher Button (>= 56px touch friendly target) */}
+          {/* Language Switcher Button */}
           <button
             aria-label={`Switch Language. Current is ${language}`}
             onClick={cycleLanguage}
